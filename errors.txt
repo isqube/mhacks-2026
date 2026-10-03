@@ -1,0 +1,23 @@
+Error while loading conda entry point: repo (cannot import name 'CondaSubcommand' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+Error while loading conda entry point: conda-anaconda-telemetry (cannot import name 'CondaRequestHeader' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+Error while loading conda entry point: conda-anaconda-tos (cannot import name 'CondaPreCommand' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+Error while loading conda entry point: repo (cannot import name 'CondaSubcommand' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+Error while loading conda entry point: conda-anaconda-telemetry (cannot import name 'CondaRequestHeader' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+Error while loading conda entry point: conda-anaconda-tos (cannot import name 'CondaPreCommand' from 'conda.plugins' (/home/daislas/anaconda3/lib/python3.14/site-packages/conda/plugins/__init__.py))
+
+PackagesNotFoundInChannelsError: The following packages are not available from current channels:
+
+  - yfinance
+
+Current channels:
+
+  - defaults
+
+To search for alternate channels that may provide the conda package you're
+looking for, navigate to
+
+    https://anaconda.org
+
+and use the search bar at the top of the page.
+
+

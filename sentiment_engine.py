@@ -21,7 +21,6 @@ def analyze_headline_sentiment(
     Evaluates news headlines against a custom user rule.
     Returns a normalized sentiment score between -1.0 (Extreme Negative) and +1.0 (Extreme Positive).
     """
-    load_dotenv(Path("/home/daislas/mhacks-2026/.env"))
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not configured.")

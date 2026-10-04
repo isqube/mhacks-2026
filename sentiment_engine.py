@@ -1,8 +1,11 @@
 import json
 import os
+from dotenv import load_dotenv
+from pathlib import Path
 from functools import lru_cache
 
 import openai
+
 
 @lru_cache(maxsize=1)
 def _get_client(api_key: str) -> openai.OpenAI:
@@ -18,7 +21,8 @@ def analyze_headline_sentiment(
     Evaluates news headlines against a custom user rule.
     Returns a normalized sentiment score between -1.0 (Extreme Negative) and +1.0 (Extreme Positive).
     """
-    api_key = ("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")
+    load_dotenv(Path("/home/daislas/mhacks-2026/.env"))
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not configured.")
 

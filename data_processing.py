@@ -1,6 +1,9 @@
 import pandas as pd
 import yfinance as yf
 import logging
+import json
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 from collections.abc import Mapping
 
 def get_market_data(ticker: str, start_date: str, end_date: str, inter: str = '1d') -> pd.DataFrame:
@@ -56,9 +59,25 @@ def _parse_news_item(item: Mapping) -> dict | None:
 
 
 def get_news_headlines(ticker: str) -> list[dict]:
+    symbol = ticker.strip().upper()
+    if not symbol:
+        raise ValueError("Ticker must not be empty.")
+
+    query = urlencode({
+        "q": symbol,
+        "newsCount": 10,
+        "quotesCount": 1,
+        "enableFuzzyQuery": "false",
+    })
+    request = Request(
+        f"https://query1.finance.yahoo.com/v1/finance/search?{query}",
+        headers={"User-Agent": "Mozilla/5.0"},
+    )
+
     try:
-        tick = yf.Ticker(ticker)
-        news = tick.get_news()
+        with urlopen(request, timeout=15) as response:
+            payload = json.load(response)
+        news = payload.get("news", []) if isinstance(payload, Mapping) else []
         headlines = [
             headline
             for item in news or []
@@ -68,14 +87,12 @@ def get_news_headlines(ticker: str) -> list[dict]:
         ]
         if headlines:
             return headlines
+        raise RuntimeError(f"No current news headlines were found for {symbol}.")
     except Exception as exc:
-        logging.warning("Unable to fetch news headlines for %s: %s", ticker, exc)
-
-    return [
-        {"title": f"{ticker} beats Q3 earnings expectations with record revenue growth", "publisher": "Reuters"},
-        {"title": f"Regulatory scrutiny tightens around {ticker} supply chain", "publisher": "Bloomberg"},
-        {"title": f"Analysts upgrade {ticker} rating citing strong AI margin expansion", "publisher": "CNBC"}
-    ]
+        logging.warning("Unable to fetch news headlines for %s: %s", symbol, exc)
+        if isinstance(exc, RuntimeError):
+            raise
+        raise RuntimeError(f"Unable to fetch news headlines for {symbol}.") from exc
 
 #headlines = get_news_headlines('TSLA')
 

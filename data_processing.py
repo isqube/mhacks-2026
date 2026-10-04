@@ -1,27 +1,37 @@
 import pandas as pd
 import yfinance as yf
-import json
-import datetime as dt
 import logging
 from collections.abc import Mapping
 
-start_date = dt.date(2019, 6, 13)
-end_date = dt.date(2022, 6, 19)
-
-#get closing prices and relative returns
 def get_market_data(ticker: str, start_date: str, end_date: str, inter: str = '1d') -> pd.DataFrame:
-    """Fetch daily adjusted close prices and calculate daily returns."""
-    df = yf.download(tickers = ticker, start=start_date, end=end_date, interval=inter)
-    # yfinance multi-index column handling
+    """Fetch closing prices and calculate daily returns."""
+    if not ticker.strip():
+        raise ValueError("Ticker must not be empty.")
+    if start_date >= end_date:
+        raise ValueError("Start date must be before end date.")
+
+    prices = yf.download(
+        tickers=ticker.strip().upper(),
+        start=start_date,
+        end=end_date,
+        interval=inter,
+        auto_adjust=False,
+        progress=False,
+    )
+    if prices.empty or 'Close' not in prices:
+        raise ValueError(f"No market data was found for {ticker.upper()}.")
+
+    close = prices['Close']
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    close = close.rename('Closing Price').dropna()
+    if close.empty:
+        raise ValueError(f"No closing prices were found for {ticker.upper()}.")
+
     return pd.concat(
-        [df['Close'], df.pct_change().dropna()['Close']],
+        [close, close.pct_change().rename('Relative Return')],
         axis=1,
-    ).set_axis(['Closing Price', 'Relative Return'], axis=1)
-
-market_data = get_market_data('TSLA', start_date.isoformat(), end_date.isoformat(), '3mo')
-
-with pd.option_context('display.max_rows', 10, 'display.max_columns', None):
-    print(market_data)
+    ).dropna()
 
 
 def _parse_news_item(item: Mapping) -> dict | None:
@@ -67,7 +77,7 @@ def get_news_headlines(ticker: str) -> list[dict]:
         {"title": f"Analysts upgrade {ticker} rating citing strong AI margin expansion", "publisher": "CNBC"}
     ]
 
-headlines = get_news_headlines('TSLA')
+#headlines = get_news_headlines('TSLA')
 
-for headline in headlines:
-    print(headline["title"])
+#for headline in headlines:
+#    print(headline["title"])
